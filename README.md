@@ -31,4 +31,4 @@ This application fetches country data and displays it alongside weather informat
 ## Note:
 - Ensure an active internet connection to fetch live data from APIs.
 - Some features (like displaying weather) may require an API key for proper functionality.
-This format is suitable for displaying in VS Code's Markdown preview a
+This format is suitable for displaying in VS Code's Markdown preview 
