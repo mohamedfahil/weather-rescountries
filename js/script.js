@@ -1,4 +1,4 @@
-// Fetching country data from API
+// Function to fetch country data from API
 async function fetchCountries() {
     try {
         const response = await fetch("https://restcountries.com/v3.1/all");
@@ -12,32 +12,22 @@ async function fetchCountries() {
     }
 }
 
-// Displaying countries
+// Function to display countries
 function displayCountries(countries) {
-    const container = document.createElement("div");
-    container.className = "container";
-    document.body.appendChild(container);
-
-    const title = document.createElement("h1");
-    title.textContent = "Countries Weather Update";
-    title.className = "text-center";
-    container.appendChild(title);
-
-    const row = document.createElement("div");
-    row.className = "row";
-    container.appendChild(row);
+    const container = document.getElementById("countries-container");
 
     countries.forEach(country => {
         const col = document.createElement("div");
         col.className = "col-sm-6 col-md-4 col-lg-4 col-xl-4 mb-4";
-        row.appendChild(col);
-
+        
         const card = createCountryCard(country);
         col.appendChild(card);
+
+        container.appendChild(col);
     });
 }
 
-// Creating a card for each country
+// Function to create a card for each country
 function createCountryCard(country) {
     const card = document.createElement("div");
     card.className = "card h-100 border-black";
@@ -71,7 +61,14 @@ function createCountryCard(country) {
     const btn = document.createElement("button");
     btn.className = "btn btn-primary mt-auto";
     btn.textContent = "Click for weather";
-    btn.addEventListener("click", () => showWeather(country.capital));
+    btn.addEventListener("click", async () => {
+        try {
+            const weatherData = await fetchWeather(country.capital);
+            displayWeather(weatherData);
+        } catch (error) {
+            displayWeatherError();
+        }
+    });
     cardBody.appendChild(btn);
 
     return card;
@@ -85,7 +82,7 @@ function createCardParagraph(text) {
     return p;
 }
 
-// Fetching weather data for a country's capital
+// Function to fetch weather data for a city
 async function fetchWeather(city) {
     const apiKey = "ff4489edb69dfaec1eb032e4ed3bbce9";
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
@@ -102,17 +99,7 @@ async function fetchWeather(city) {
     }
 }
 
-// Displaying weather information
-async function showWeather(city) {
-    try {
-        const weatherData = await fetchWeather(city);
-        displayWeather(weatherData);
-    } catch (error) {
-        displayWeatherError();
-    }
-}
-
-// Displaying weather information on UI
+// Function to display weather information at the top of the page
 function displayWeather(weatherData) {
     const temperature = weatherData.main.temp.toFixed(1);
     let emoji = "";
@@ -123,27 +110,32 @@ function displayWeather(weatherData) {
     else emoji = "🥵";
 
     const message = `${temperature}°C ${emoji}`;
-    const tempDisplay = document.querySelector("#temp-display");
+    const weatherDisplay = document.getElementById("weather-display");
 
-    if (tempDisplay) {
+    if (weatherDisplay) {
+        // Clear previous content and insert new weather information
+        weatherDisplay.innerHTML = '';
+        const tempDisplay = document.createElement("h2");
+        tempDisplay.className = "temp-display";
         tempDisplay.textContent = message;
+        weatherDisplay.appendChild(tempDisplay);
     } else {
-        console.error("Element with id 'temp-display' not found.");
+        console.error("Element with id 'weather-display' not found.");
     }
 }
 
-// Displaying error message for weather fetch failure
+// Function to display error message for weather fetch failure
 function displayWeatherError() {
-    const tempDisplay = document.querySelector("#temp-display");
+    const weatherDisplay = document.getElementById("weather-display");
 
-    if (tempDisplay) {
-        tempDisplay.textContent = "Please try again later 🙏";
+    if (weatherDisplay) {
+        weatherDisplay.innerHTML = `<h2 id="temp-display" class="temp-display">Please try again later 🙏</h2>`;
     } else {
-        console.error("Element with id 'temp-display' not found.");
+        console.error("Element with id 'weather-display' not found.");
     }
 }
 
-// Displaying error message for country data fetch failure
+// Function to display error message for country data fetch failure
 function displayError(error) {
     const container = document.createElement("div");
     container.className = "container vh-100 d-flex justify-content-center align-items-center";
@@ -156,5 +148,3 @@ function displayError(error) {
 
 // Initial function call to fetch and display countries
 fetchCountries();
-
-/************************** End **************************/
